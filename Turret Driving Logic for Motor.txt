@@ -1,0 +1,148 @@
+"The toolpost has a DC motor driving a worm and wheel, and a rachet
+with a click for each tool station. On the shaft holding the
+toolholder there is an optical disk with three  tracks, and each tool
+station has a unique coding on those three tracks.
+
+What Denford did was to drive the motor in the forwards direction
+until the correct code was read from the three tracks, then reverse
+the motor against the rachet and leave it in a stalled condition.
+This way tends to overheat the motor.
+
+My circuit basically does the same, but when 'on station' only
+reverses for three seconds then powers off the motor. I find that
+cutting forces happily keep the rachet and pawl engaged.
+
+I read the status of the three tracks into the parallel port of a PC,
+and drive forwards until I get what I want, then using a 555 timer
+run in reverse for three seconds. The motor is driven using an
+L298 'H Bridge' circuit."
+
+
+The hardware is as follows: 
+
+The 3 sensor wires are opto isolated and sent to the computer port
+The motor is driven by an ouput line from computer to an L298 driver ( High for fowards and low for reverse) and an 555 timer to cut the reverse after 3 seconds. A line from the timer is sent to the port to notify job done.
+
+
+I hope this is helpful and a thanks to Dave Murray for help with some obvious errors in coding.
+
+
+MACRO:
+'Unit toolpost;
+
+'{toolpost unit for Mach3
+'{Provides drivers to control the tool post on the Denford ORAC Lathe}
+'{Attached to $278, pin 14 low starts toolpost to revolve, pin 15 }
+'{ is a 'busy' bit, pins 11, 12, & 13 are data bits indicating which}
+'{ tool is presented pin 11 being inverted}
+
+'{Pin 14 going low starts the cycle, the program checks pins 11,12,&13}
+'{until the correct tool is presented, then raises pin 14. This makes }
+'{the toolpost reverse onto its location rachet. Program waits until
+'{busy bit clears}
+
+'{start toolpost  forcing pin 14 low}
+'{stop toolpost   forcing pin 14 high}
+'------------------------------------------------------------------
+
+'OEM Trigger #1 = pin 11
+'OEM Trigger #2 = pin 12
+'OEM Trigger #3 = pin 13
+'OEM Trigger #4 = pin 15
+'OEM Output  #1 = pin 14
+Option Explicit
+
+
+Dim TOOL,OldTool,SelectedTool,MaxToolNum,T,TSET,C
+Dim PIN_A,PIN_B,PIN_C,PINVALUE,XPOS
+
+'Tool Changer Macro 
+
+SYSTEMWAITFOR (32)
+
+Oldtool = GetDro (5) 'C Axis DRO used as a memory for last tool, I know this is a bodge but it works for me.
+
+Tool = GetSelectedTool()
+
+SelectedTool =0
+MaxToolNum = 8      'Max number off tools for the changer
+
+' do not allow tool number greater than number of turret positions
+While tool > MaxToolNum Or tool < 1
+Tool = Question ("Invalid Tool Requested, New Tool Number?")
+Wend
+
+If Tool = OldTool Then
+Message ("Tool already selected") 
+Exit Sub
+End If
+
+ActivateSignal(Output1) 
+
+T = Second(Now)
+TSET = T + 1.5      ' ADD A 0.5 SEC WAIT
+Do
+T = Second(Now)
+Loop Until T > TSET
+
+Do 
+'OEM Trigger #1
+Pin_A = IsActive (29)'INNER
+'OEM Trigger #2
+Pin_B = IsActive (30)'MIDDLE   TOOL CODE WHEEL TRACKS
+'OEM Trigger #3
+Pin_C = IsActive (31)'OUTER
+
+PinValue = 0
+
+If Pin_A Then PinValue = PinValue + 1
+If Pin_B Then PinValue = PinValue + 2
+If Pin_C Then PinValue = PinValue + 4
+
+Select Case PinValue
+Case = 7
+SelectedTool = 6
+Case = 6
+SelectedTool = 7
+Case = 5
+SelectedTool = 3
+Case = 4
+SelectedTool = 2
+Case = 3
+SelectedTool = 5
+Case = 2
+SelectedTool = 8
+Case = 1
+SelectedTool = 4
+Case = 0
+SelectedTool = 1
+End Select
+
+For c = 1 To 2000  '2000
+Next
+
+Loop Until SelectedTool = Tool
+
+deActivateSignal(Output1) 
+
+Tool = SelectedTool
+
+'Check Busy Flag
+Do While IsActive(32) = false
+Loop
+
+'Send current tool to memory (C dro)
+SetDro (5,tool)
+
+Message ("Selected Tool" & tool)
+SetCurrentTool(Tool)
+
+End
+
+
+CSKPP bearing CSKXXPP where XX is diameter metric.  PP means slots in inner and outer portion of bearing for locking without a press fit.  VXB has one for $25 with 50 ft/lbs of torque capacity.  Standard sizes etc.
+
+Hammond makes enclosures with sloped front, called console enclosures.  They are made of 14 gauge steel and are sealed and are liquid/dust proof, nema 12 rated, perfect actually. $250 cheaper than I can have a custom one made.
+
+1488JN11
+

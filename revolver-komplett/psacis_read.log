@@ -1,0 +1,32 @@
+System Name        : Windows_NT
+Machine Name       : PETER2600
+User Name          : Administrator
+Source system      : XAcis
+Destination system : XGeneric
+Start Time         : Sun Sep 12 18:09:28 2004
+
+-----------------------------------------------------------------------------------------------------------
+---------------------------------File Header Information------------------------------------------------------
+Product Id        :   SPATIAL - INTEROP Version - 11.0.6
+Date              :    Not Available 
+Unit              :   1.000000
+Acis Version      :    Not Available 
+File Version      :   0
+Resabs            :    Not Available 
+Resnor            :    Not Available 
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+---------------------------------Conversion Summary----------------------------------------------------
+No. of Assemblies                         :    0
+No. of Solid Bodies                       :    156
+No. of Trim Bodies                        :    0
+No. of Wire Bodies                        :    0
+No. of Point Bodies                       :    0
+Number of Mixed Bodies		    : 0
+Number of Single Points        : 0
+-----------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------
+The result of the Translation is : OK
+Finish Time : Sun Sep 12 18:09:53 2004
+
+-----------------------------------------------------------------------------------------------------------
